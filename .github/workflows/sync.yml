@@ -11,6 +11,10 @@ on:
         description: "Dry run (log what would happen, change nothing)"
         type: boolean
         default: false
+      backfill_since:
+        description: "One-time catch-up: scan the whole channel back to this date, e.g. 2026-01-01 (leave blank for a normal run)"
+        type: string
+        default: ""
 
 concurrency:
   group: discord-spotify-sync
@@ -22,7 +26,7 @@ permissions:
 jobs:
   sync:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 120  # normal runs finish in about a minute; a long backfill needs room
     steps:
       - uses: actions/checkout@v4
 
@@ -42,3 +46,4 @@ jobs:
           SPOTIFY_REFRESH_TOKEN: ${{ secrets.SPOTIFY_REFRESH_TOKEN }}
           SPOTIFY_PLAYLIST_ID: ${{ secrets.SPOTIFY_PLAYLIST_ID }}
           DRY_RUN: ${{ inputs.dry_run && '1' || '' }}
+          BACKFILL_SINCE: ${{ inputs.backfill_since }}
